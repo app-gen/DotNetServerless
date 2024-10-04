@@ -1,0 +1,46 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+# POST Request
+POST http://localhost:5000/api/products
+Content-Type: application/text
+
+1+1+1 
+
+
+
+
+
+# GET Request
+GET http://localhost:5000/api/products
+Content-Type: application/json
+Authorization: Bearer <your_token_here>
+
+###
+
+# POST Request
+POST http://localhost:5000/api/products
+Content-Type: application/json
+
+{
+  "name": "New Product",
+  "price": 19.99,
+  "description": "A cool new product"
+}
+
+###
+
+# PUT Request
+PUT http://localhost:5000/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Updated Product",
+  "price": 29.99,
+  "description": "Updated description"
+}
+
+###
+
+# DELETE Request
+DELETE http://localhost:5000/api/products/1
+

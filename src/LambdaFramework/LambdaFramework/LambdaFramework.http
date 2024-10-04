@@ -1,0 +1,6 @@
+@LambdaFramework_HostAddress = http://localhost:5293
+
+GET {{LambdaFramework_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
