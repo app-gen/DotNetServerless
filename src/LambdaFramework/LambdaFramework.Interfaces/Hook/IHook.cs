@@ -15,10 +15,10 @@ namespace LambdaFramework.Common;
 
 public interface IHook
 {
-    //ICommandContext? context = null, IExecutionContext? ec = null
+    //ICommandContext? context = null, IExecutionContext? executionContext = null
     Task<Tuple<string,bool>> 
         Execute(string tenantName, string commandName, string actionName, string version, string parameters, 
-        ICommandContext? context = null, IExecutionContext? ec = null,
+        ICommandContext? context = null, IExecutionContext? executionContext = null,
         HookAttribute? attribute = null);
         //);
 }

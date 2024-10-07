@@ -63,12 +63,12 @@ public class CommandRouter : ICommandRouter
         foreach (var preHook in _preHooks.Values)
         {
             var hook = (IHook)ActivatorUtilities.CreateInstance(_serviceProvider, preHook.HookType);
-            if (!await hook.Execute(tenantName, commandName, actionName, version, parameters))
-            {
-                _logger.LogWarning("Pre-hook {HookName} failed for command {TenantName}:{CommandName}:{ActionName}:{Version}",
-                    preHook.HookName, tenantName, commandName, actionName, version);
-                return JsonSerializer.Serialize(new { Success = false, Message = "Pre-hook execution failed" });
-            }
+            //if (!await hook.Execute(tenantName, commandName, actionName, version, parameters))
+            //{
+            //    _logger.LogWarning("Pre-hook {HookName} failed for command {TenantName}:{CommandName}:{ActionName}:{Version}",
+            //        preHook.HookName, tenantName, commandName, actionName, version);
+            //    return JsonSerializer.Serialize(new { Success = false, Message = "Pre-hook execution failed" });
+            //}
         }
 
         ICommand command = (ICommand)ActivatorUtilities.CreateInstance(_serviceProvider, commandInfo.CommandType);

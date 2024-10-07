@@ -5,10 +5,10 @@ namespace LambdaFramework.Common
     {
         void ClearCommands();
         Task<string> ExecuteCommand(string tenantName, string commandName, string actionName, string version, string parameters, 
-            ICommandContext? context = null, IExecutionContext? econtext = null);
+            ICommandContext? context = null, IExecutionContext? executionContextontext = null);
 
         Task<string> ExecuteCommand(string tenantName, string commandName, string actionName, string version, Dictionary<string,string> parameters,
-            ICommandContext? context = null, IExecutionContext? econtext = null);
+            ICommandContext? context = null, IExecutionContext? executionContextontext = null);
 
         void RegisterCommand(CommandInfo commandInfo);
         void RegisterHook(HookInfo hookInfo);

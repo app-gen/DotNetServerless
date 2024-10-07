@@ -5,6 +5,7 @@ using System.Text.Json;
 
 namespace SampleWebApiHost;
 
+//Sample Program
 
 public class Program
 {
@@ -21,6 +22,7 @@ public class Program
             });
 }
 
+//Sample Program
 
 public class Startup
 {
@@ -31,8 +33,6 @@ public class Startup
         services.AddCommandApiLib(options =>
         {
             options.PluginDirectoty = "plugins";
-            //   options.GetEndpoint = "/commandapi/get";
-            // options.PostEndpoint = "/commandapi/post";
             options.EnableLogging = true;  // Disable logging for example
         });
     }
@@ -46,7 +46,7 @@ public class Startup
 
         app.UseRouting();
 
-
+        
         //Add Serverless Lib
         app.UseCommandApiLib(router,context);
 

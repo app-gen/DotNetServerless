@@ -1,17 +1,21 @@
-﻿/*
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
-*/
-
-namespace LambdaFramework.Common;
+﻿namespace LambdaFramework.Common;
 
 public interface ICommand
 {
-    Task<string> Execute(string parameters, ICommandContext? context=null, IExecutionContext? ec= null);
+    Task<string> Execute(string parameters, ICommandContext? context=null, IExecutionContext? executionContext= null);
 
-    Task<CommandOutput> ExecuteCommand(CommandInput parameters, ICommandContext? context = null, IExecutionContext? ec = null);
+    Task<T> Execute<T>(T paramas, ICommandContext? context = null, IExecutionContext? executionContext = null);
+
+
+    Task<string> Execute(IRunContext runData, ICommandContext? context = null, IExecutionContext? executionContext = null);
+
+    Task<string> Execute(object parameters, ICommandContext? context = null, IExecutionContext? executionContext = null);
+
+
+    Task<string> Execute(string msgKey, string msgBody, IJobContext? jobContext,  ICommandContext? context = null, IExecutionContext? executionContext = null);
+
+
+    Task<CommandOutput> Execute(CommandInput parameters, ICommandContext? context = null, IExecutionContext? executionContext = null);
 
 
 }

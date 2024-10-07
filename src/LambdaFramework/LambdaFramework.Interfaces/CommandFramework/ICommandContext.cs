@@ -8,4 +8,15 @@ namespace LambdaFramework.Common
 
         Task<string> ExecuteCommand(string commandName, string actionName, string version, string parameters);
     }
+
+    public interface IJobContext
+    {
+        
+    }
+
+    public interface IRunContext
+    {
+
+    }
+
 }

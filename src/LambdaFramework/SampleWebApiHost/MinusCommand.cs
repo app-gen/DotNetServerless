@@ -62,7 +62,7 @@ public class Debug2Hook : IHook
 
 
     public async Task<Tuple<string, bool>> Execute(string tenantName, string commandName, string actionName, string version, string parameters,
-        ICommandContext? context = null, IExecutionContext? ec = null, HookAttribute? attribute = null)
+        ICommandContext? context = null, IExecutionContext? executionContext = null, HookAttribute? attribute = null)
     {
 
 
@@ -82,7 +82,7 @@ public class Discount : IHook
 {
 
     public async Task<Tuple<string, bool>> Execute(string tenantName, string commandName, string actionName, string version, string parameters,
-        ICommandContext? context = null, IExecutionContext? ec = null, HookAttribute? attribute = null)
+        ICommandContext? context = null, IExecutionContext? executionContext = null, HookAttribute? attribute = null)
     {
 
         var rate = decimal.Parse(parameters);
@@ -100,7 +100,7 @@ public class Tax : IHook
 {
 
     public async Task<Tuple<string, bool>> Execute(string tenantName, string commandName, string actionName, string version, string parameters,
-        ICommandContext? context = null, IExecutionContext? ec = null, HookAttribute? attribute = null)
+        ICommandContext? context = null, IExecutionContext? executionContext = null, HookAttribute? attribute = null)
     {
 
         var rate = decimal.Parse(parameters);
@@ -136,7 +136,7 @@ public class OtherTax : IHook
 {
 
     public async Task<Tuple<string, bool>> Execute(string tenantName, string commandName, string actionName, string version, string parameters,
-        ICommandContext? context = null, IExecutionContext? ec = null, HookAttribute? attribute = null)
+        ICommandContext? context = null, IExecutionContext? executionContext = null, HookAttribute? attribute = null)
     {
 
         var rate = decimal.Parse(parameters);

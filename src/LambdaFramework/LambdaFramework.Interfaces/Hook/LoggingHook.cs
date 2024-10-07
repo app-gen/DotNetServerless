@@ -16,7 +16,7 @@ public class LoggingHook : IHook
 
 
     public async Task<Tuple<string, bool>> Execute(string tenantName, string commandName, string actionName, string version, string parameters, 
-        ICommandContext? context = null, IExecutionContext? ec = null, HookAttribute? attribute = null)
+        ICommandContext? context = null, IExecutionContext? executionContext = null, HookAttribute? attribute = null)
     {
         
 
@@ -42,7 +42,7 @@ public class DebugHook : IHook
 
 
     public async Task<Tuple<string, bool>> Execute(string tenantName, string commandName, string actionName, string version, string parameters, 
-        ICommandContext? context = null, IExecutionContext? ec = null, HookAttribute? attribute = null)
+        ICommandContext? context = null, IExecutionContext? executionContext = null, HookAttribute? attribute = null)
     {
         
 
