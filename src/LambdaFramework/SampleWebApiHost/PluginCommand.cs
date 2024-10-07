@@ -3,6 +3,52 @@ using LambdaFramework.Common;
 
 namespace SampleWebApiHost;
 
+
+
+//base command for all tentants
+[Command("Task", "Add", "1.0.0.0", "")]
+public class TaskAddCommand_Common : AbstractCommand, ICommand
+{
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec = null)
+    {
+        await Task.Delay(1);
+        //todo add a task to table
+        return parameters;
+
+    }
+}
+
+
+[Command("Notes", "Add", "1.0.0.0", "")]
+public class NotesAddCommand_Common : AbstractCommand, ICommand
+{
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec = null)
+    {
+        await Task.Delay(1);
+        //todo add a task to table
+        return parameters;
+
+
+    }
+}
+
+
+//override the base command
+[Command("Task", "Add", "1.0.0.0", "TenanatA")]
+public class TenanatA_TaskAddCommand : AbstractCommand, ICommand
+{
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec = null)
+    {
+        await Task.Delay(1);
+        //todo add a task to table
+        return parameters;
+
+
+    }
+}
+
+
+
 [Command("Math", "Minus", "1.0.0.0", "")]
 public class MinusCommand : AbstractCommand, ICommand
 {
@@ -76,7 +122,7 @@ public class Debug2Hook : IHook
     }
 }
 
-
+//Common Command for all 
 [Hook("Discount", "Product:Price:1.0.0.0", "", HookType.Pre, InputData.Modify, OutputData.None)]
 public class Discount : IHook
 {
@@ -94,6 +140,46 @@ public class Discount : IHook
 
     }
 }
+
+
+
+[Hook("Discount", "Product:Price:1.0.0.0", "TenantA", HookType.Pre, InputData.Modify, OutputData.None)]
+public class TenantADiscount_Pre : IHook
+{
+
+    public async Task<Tuple<string, bool>> Execute(string tenantName, string commandName, string actionName, string version, string parameters,
+        ICommandContext? context = null, IExecutionContext? executionContext = null, HookAttribute? attribute = null)
+    {
+
+        var rate = decimal.Parse(parameters);
+        var finalRate = rate * 0.85M;
+
+        var data = Tuple.Create(finalRate.ToString(), true);
+        await Task.Delay(1);
+        return (data);
+
+    }
+}
+
+
+[Hook("Discount", "Product:Price:1.0.0.0", "TenantA", HookType.Post, InputData.Modify, OutputData.None)]
+public class TenantADiscount_Post : IHook
+{
+
+    public async Task<Tuple<string, bool>> Execute(string tenantName, string commandName, string actionName, string version, string parameters,
+        ICommandContext? context = null, IExecutionContext? executionContext = null, HookAttribute? attribute = null)
+    {
+
+        var rate = decimal.Parse(parameters);
+        var finalRate = rate * 0.85M;
+
+        var data = Tuple.Create(finalRate.ToString(), true);
+        await Task.Delay(1);
+        return (data);
+
+    }
+}
+
 
 [Hook("Tax", "Product:Price:1.0.0.0", "", HookType.Pre, InputData.Modify, OutputData.None)]
 public class Tax : IHook
