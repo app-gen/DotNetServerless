@@ -95,7 +95,7 @@ public class PluginLoader
         }
     }
 
-    public static void LoadPluginsFromCurrentAssembly( ICommandRouter router)
+    public static void LoadCommonPlugins( ICommandRouter router)
     {
         var pluginAssembly = Assembly.GetExecutingAssembly();
         if (pluginAssembly != null)

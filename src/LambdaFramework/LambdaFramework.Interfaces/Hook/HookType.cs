@@ -6,5 +6,15 @@ public enum HookType
     Post
 }
 
+public enum InputData
+{
+    None,
+    Modify
+}
 
+public enum OutputData
+{
+    None,
+    Modify
+}
 

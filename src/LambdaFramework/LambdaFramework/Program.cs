@@ -1,6 +1,7 @@
 
 using LambdaFramework.Common;
 using Microsoft.AspNetCore.Hosting;
+
 using System.Text.Json;
 
 namespace LambdaFramework;
@@ -76,7 +77,7 @@ public class Startup
         });
 
         // Load plugins
-        PluginLoader.LoadPluginsFromCurrentAssembly(router);
+        PluginLoader.LoadCommonPlugins(router);
 
         //PluginLoader.LoadPlugins("");
     }

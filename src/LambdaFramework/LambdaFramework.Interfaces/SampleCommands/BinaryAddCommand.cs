@@ -18,7 +18,7 @@ public class BinaryAddCommand : AbstractCommand, ICommand
         return Convert.ToString(sum, 2);
     }
 
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
 
         await Task.Delay(1);

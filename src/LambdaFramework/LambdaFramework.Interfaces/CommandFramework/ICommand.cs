@@ -9,9 +9,9 @@ namespace LambdaFramework.Common;
 
 public interface ICommand
 {
-    Task<string> Execute(string parameters, ICommandContext? context=null);
+    Task<string> Execute(string parameters, ICommandContext? context=null, IExecutionContext? ec= null);
 
-    Task<CommandOutput> ExecuteCommand(CommandInput parameters, ICommandContext? context = null);
+    Task<CommandOutput> ExecuteCommand(CommandInput parameters, ICommandContext? context = null, IExecutionContext? ec = null);
 
 
 }

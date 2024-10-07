@@ -3,7 +3,7 @@
 [Command("Task", "Add", "1.0.0.0", "")]
 public class AddCommand : AbstractCommand, ICommand
 {
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
         await Task.Delay(1);
 
@@ -17,7 +17,7 @@ public class AddCommand : AbstractCommand, ICommand
 [Command("SampleTask", "Update", "1.0.0.0", "")]
 public class UpdateCommand : AbstractCommand, ICommand
 {
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
         await Task.Delay(1);
 
@@ -30,7 +30,7 @@ public class UpdateCommand : AbstractCommand, ICommand
 [Command("SampleTask", "Search", "1.0.0.0", "")]
 public class SearchCommand : AbstractCommand, ICommand
 {
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
         await Task.Delay(1);
 
@@ -43,7 +43,7 @@ public class SearchCommand : AbstractCommand, ICommand
 [Command("SampleTask", "Get", "1.0.0.0", "")]
 public class GetCommand : AbstractCommand, ICommand
 {
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
         await Task.Delay(1);
 
@@ -56,7 +56,7 @@ public class GetCommand : AbstractCommand, ICommand
 [Command("SampleTask", "Delete", "1.0.0.0", "")]
 public class DeleteCommand : AbstractCommand, ICommand
 {
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
         await Task.Delay(1);
 
@@ -69,7 +69,7 @@ public class DeleteCommand : AbstractCommand, ICommand
 [Command("SampleTask", "Approve", "1.0.0.0", "")]
 public class ApproveCommand : AbstractCommand, ICommand
 {
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
         await Task.Delay(1);
 
@@ -83,7 +83,7 @@ public class ApproveCommand : AbstractCommand, ICommand
 [Command("SampleTask", "Hold", "1.0.0.0", "")]
 public class HoldCommand : AbstractCommand, ICommand
 {
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
         await Task.Delay(1);
 
@@ -97,7 +97,7 @@ public class HoldCommand : AbstractCommand, ICommand
 [Command("SampleTask", "Hold", "2.0.0.0", "")]
 public class HoldCommandV2 : AbstractCommand, ICommand
 {
-    public async override Task<string> Execute(string parameters, ICommandContext? context = null)
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {
         await Task.Delay(1);
 

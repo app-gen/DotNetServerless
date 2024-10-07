@@ -45,7 +45,10 @@ public class CommandRouter : ICommandRouter
         _postHooks.Clear();
     }
 
-    public async Task<string> ExecuteCommand(string tenantName, string commandName, string actionName, string version, string parameters, CommandContext context = null)
+    public async Task<string> ExecuteCommand(string tenantName, string commandName, string actionName, string version, string parameters, 
+        ICommandContext context = null, IExecutionContext ec = null
+        
+        )
     {
         CommandInfo commandInfo = FindCommand(tenantName, commandName, actionName, version);
 
@@ -105,6 +108,52 @@ public class CommandRouter : ICommandRouter
         }
 
         return null;
+    }
+
+    public Task<string> ExecuteCommand(string tenantName, string commandName, string actionName, string version, 
+        Dictionary<string, string> parameters, ICommandContext context = null, IExecutionContext econtext = null)
+    {
+
+        //CommandInfo commandInfo = FindCommand(tenantName, commandName, actionName, version);
+
+        //if (commandInfo == null)
+        //{
+        //    throw new KeyNotFoundException($"Command not found: {tenantName}:{commandName}:{actionName}:{version}");
+        //}
+
+        //context = context ?? new CommandContext(this, tenantName);
+
+        //// Execute pre-hooks
+        //foreach (var preHook in _preHooks.Values)
+        //{
+        //    var hook = (IHook)ActivatorUtilities.CreateInstance(_serviceProvider, preHook.HookType);
+        //    if (!await hook.Execute(tenantName, commandName, actionName, version, parameters))
+        //    {
+        //        _logger.LogWarning("Pre-hook {HookName} failed for command {TenantName}:{CommandName}:{ActionName}:{Version}",
+        //            preHook.HookName, tenantName, commandName, actionName, version);
+        //        return JsonSerializer.Serialize(new { Success = false, Message = "Pre-hook execution failed" });
+        //    }
+        //}
+
+        //ICommand command = (ICommand)ActivatorUtilities.CreateInstance(_serviceProvider, commandInfo.CommandType);
+
+        //var stopwatch = Stopwatch.StartNew();
+        //var result = await command.Execute(parameters, context);
+        //stopwatch.Stop();
+
+        //_logger.LogInformation(
+        //    "Executed command {TenantName}:{CommandName}:{ActionName}:{Version} in {ElapsedMilliseconds}ms",
+        //    tenantName, commandName, actionName, version, stopwatch.ElapsedMilliseconds);
+
+        //// Execute post-hooks
+        //foreach (var postHook in _postHooks.Values)
+        //{
+        //    var hook = (IHook)ActivatorUtilities.CreateInstance(_serviceProvider, postHook.HookType);
+        //  //  await hook.Execute(tenantName, commandName, actionName, version, result);
+        //}
+
+        //return result;
+        throw new NotImplementedException();
     }
 }
 
