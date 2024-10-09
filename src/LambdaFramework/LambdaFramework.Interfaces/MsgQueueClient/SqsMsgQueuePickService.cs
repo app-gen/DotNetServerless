@@ -2,32 +2,21 @@
 
 namespace MsgQueue.Client;
 
-
-//Topic  Id 1/MsgTypeId -Notes Add 
-//Notes Add 
-//(V1,v2) 
-//(TenantA/TenantB)
-
-
-
-
-/// <summary>
-/// Concrete implementation of IMsgQueueClient for database interactions.
-/// Responsible for interacting with the database to pick and process messages.
-/// </summary>
-public class DatabaseMsgQueuePickService : IMsgQueuePickService
+public class SqsMsgQueuePickService : IMsgQueuePickService
 {
     private readonly IConfiguration _processor;
 
-    public DatabaseMsgQueuePickService(IConfiguration processor)
+    public SqsMsgQueuePickService(IConfiguration processor)
     {
         _processor = processor;
-    
+
     }
 
-    
+
     public async Task<IMsgQueueEntry?> PickMessageAsync(string topicId)
     {
+        //connet to sqs and call GetMessage(topicId) 
+
         // Simulate picking a message from the database
         // or pick from SQS or RabbitMq
         // You can replace this with actual database logic
@@ -41,18 +30,18 @@ public class DatabaseMsgQueuePickService : IMsgQueuePickService
             CommandName = "Notes", //DB will get priority fallback to local config
             ActionName = "Add",
             TenantName = "TenantA",
-            CommandVersion = "1.0.0.0" 
+            CommandVersion = "1.0.0.0"
         });
 
-        await MarkMessageAsPickedAsync(message);
+        //await MarkMessageAsPickedAsync(message);
         return message;
     }
 
     public async Task MarkMessageAsPickedAsync(IMsgQueueEntry message)
     {
         // Simulate marking the message as picked in the database
-        message.PickedAt = DateTime.UtcNow;
-        message.Status = "Picked";
+        //message.PickedAt = DateTime.UtcNow;
+        //message.Status = "Picked";
         await Task.CompletedTask;
     }
 

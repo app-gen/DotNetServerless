@@ -4,6 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MsgQueue.Server;
 
+
+//app.UseMessageQueueLib(messageQueue); 
+
+
 //public class StartupSampleServer
 //{
 //    public void ConfigureServices(IServiceCollection services)
@@ -13,22 +17,22 @@ namespace MsgQueue.Server;
 //        //services.AddDbContext<YourDbContext>(); // Add your database context here
 //    }
 
-    //public void Configure(IApplicationBuilder app, IWebHostEnvironment env, 
-    //    IMessageQueue messageQueue)
-    //{
-    //    if (env.IsDevelopment())
-    //    {
-    //        app.UseDeveloperExceptionPage();
-    //    }
+//public void Configure(IApplicationBuilder app, IWebHostEnvironment env, 
+//    IMessageQueue messageQueue)
+//{
+//    if (env.IsDevelopment())
+//    {
+//        app.UseDeveloperExceptionPage();
+//    }
 
-    //    app.UseRouting();
+//    app.UseRouting();
 
-    //    // Add the Message Queue middleware
-    //    app.UseMessageQueueLib(messageQueue);
+//    // Add the Message Queue middleware
+//    app.UseMessageQueueLib(messageQueue);
 
-    //    app.UseEndpoints(endpoints =>
-    //    {
-    //        endpoints.MapControllers();
-    //    });
-    //}
+//    app.UseEndpoints(endpoints =>
+//    {
+//        endpoints.MapControllers();
+//    });
+//}
 
