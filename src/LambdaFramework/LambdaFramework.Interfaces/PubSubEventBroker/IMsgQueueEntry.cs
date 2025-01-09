@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using MsgQueue.Server;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PubSub.EventBroker;
 
 /// <summary>
 /// Represents the interface for a single entry in the message queue.
 /// </summary>
-public interface IMsgQueueEntry
+public interface IMessageQueueEntry3:IMessageQueueEntry
 {
 
     public int MessageId { get; set; } //Pk of the table 

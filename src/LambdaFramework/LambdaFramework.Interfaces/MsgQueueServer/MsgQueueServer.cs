@@ -34,7 +34,7 @@ internal class MsgQueueServer
 //### 7. Sample API Call 
 //When you call the API endpoint `/api/mq/add/{topicId}/{ messageId}/{ msgbody}/{ user}/{ system}`,
 // it will trigger the `SendMessage` method of the `IMessageQueueServer` implementation provided by the client, adding a message to the database.
-//ByOverriding this method, we can send it to RabbitMq
+//ByOverriding this method, we can send it to RabbitMq or Amazon SQS 
 
 public class MessageQueueServerMiddleware
 {
@@ -55,11 +55,11 @@ public class MessageQueueServerMiddleware
             var routeValues = context.Request.RouteValues;
 
             // Extract route parameters
-            string topicId = routeValues["topicId"]?.ToString();
-            string messageId = routeValues["messageId"]?.ToString();
-            string msgbody = routeValues["msgbody"]?.ToString();
-            string user = routeValues["user"]?.ToString();
-            string system = routeValues["system"]?.ToString();
+            string topicId = routeValues["topicId"]?.ToString()??string.Empty;
+            string messageId = routeValues["messageId"]?.ToString() ?? string.Empty;
+            string msgbody = routeValues["msgbody"]?.ToString() ?? string.Empty;
+            string user = routeValues["user"]?.ToString() ?? string.Empty;
+            string system = routeValues["system"]?.ToString() ?? string.Empty;
 
             if (topicId != null && messageId != null && msgbody != null && user != null && system != null)
             {
@@ -150,12 +150,15 @@ public class DatabaseMsgQueueServer : IMessageQueueServer
     //}
 }
 
-internal class MessageQueueEntry : IMessageQueueEntry
+public  class MessageQueueEntry : IMessageQueueEntry
 {
 
-    public int MessageId { get; set; } //Pk of the table 
+    public long MessageId { get; set; } //Pk of the table 
+
+    public string? MessageQueueId { get; set; } //Pk of the table 
+
     public string TopicId { get; set; }
-    public string MsgBody { get; set; }
+    public string MessageBody { get; set; }
     public string? User { get; set; }
 
     public int? Retry { get; set; }
@@ -167,14 +170,14 @@ internal class MessageQueueEntry : IMessageQueueEntry
     public long? ThreadId { get; set; }
     public string? MachineName { get; set; }
 
-    public DateTime? PickupTime { get; set; }
-    public DateTime? StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
+    public DateTime? PickupTimeUtc { get; set; }
+    public DateTime? StartTimeUtc { get; set; }
+    public DateTime? EndTimeUtc { get; set; }
     public int? ProcessTimeInMilliSeconds { get; set; }
     public string? ErrorCode { get; set; }
     public string? ErrorMessage { get; set; }
-    public DateTime? UtcExecutionTime { get; set; }
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? ExecutionTimeUtc { get; set; }
+    public DateTime? CreatedTimeUtc { get; set; }
 
 
     public string? System { get; set; }
@@ -183,7 +186,7 @@ internal class MessageQueueEntry : IMessageQueueEntry
     public string? TenantName { get; set; }
     public string? CommandVersion { get; set; }
     public DateTime PickedAt { get; set; }
-    public DateTime? ProcessedAt { get; set; }
+    public DateTime? ProcessedTimeUtc { get; set; }
     public string? Status { get; set; }
 
     [NotMapped]
@@ -191,6 +194,6 @@ internal class MessageQueueEntry : IMessageQueueEntry
 
     [NotMapped]
     public object? ExtraData { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string MessageBody { get; set; }
+  //  public DateTime CreatedAt { get; set; }
+   // public string MessageBody { get; set; }
 }

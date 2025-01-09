@@ -1,4 +1,4 @@
-﻿namespace MsgQueue.Client;
+﻿namespace MsgQueue.Client.Service;
 
 public interface ITopicConfig
 {

@@ -1,4 +1,4 @@
-﻿namespace MsgQueue.Client;
+﻿namespace MsgQueue.Client.Service;
 
 /// <summary>
 /// Configures topics and the number of threads/tasks per topic for processing messages.
@@ -26,3 +26,7 @@ public class TopicConfig : ITopicConfig
 
 }
 
+public class TopicConfigList
+{
+    public List<TopicConfig> Topics { get; set; } = new();
+}

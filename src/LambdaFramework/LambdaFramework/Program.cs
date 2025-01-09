@@ -39,15 +39,15 @@ public class Startup
         }
 
         app.UseRouting();
-
+        //Important 
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapPost("/api/execute/{tenantId}/{commandName}/{actionName}/{version}/{inputFormat?}/{outputFormat?}", async context =>
             {
-                var tenantId = context.Request.RouteValues["tenantId"] as string;
-                var commandName = context.Request.RouteValues["commandName"] as string;
-                var actionName = context.Request.RouteValues["actionName"] as string;
-                var version = context.Request.RouteValues["version"] as string;
+                string tenantId = (context.Request.RouteValues["tenantId"] as string)??string.Empty;
+                var commandName = (context.Request.RouteValues["commandName"] as string) ?? string.Empty;
+                var actionName = (context.Request.RouteValues["actionName"] as string) ?? string.Empty;
+                var version = (context.Request.RouteValues["version"] as string)?? string.Empty;
 
                 if (tenantId?.ToLower() == "any"  || tenantId?.ToLower() == "all")
                 {

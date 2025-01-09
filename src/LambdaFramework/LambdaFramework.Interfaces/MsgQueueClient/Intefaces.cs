@@ -1,3 +1,5 @@
+using MsgQueue.Server;
+
 namespace MsgQueue.Client;
 
 /// <summary>
@@ -6,6 +8,6 @@ namespace MsgQueue.Client;
 /// </summary>
 public interface IMessageQueueSystem
 {
-    Task SendMessageAsync(IMsgQueueEntry messageEntry);
+    Task SendMessageAsync(IMessageQueueEntry messageEntry);
 }
 

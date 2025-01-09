@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using MsgQueue.Server;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
@@ -9,7 +10,7 @@ namespace PubSub.Publisher;
 public interface IPublisherServer
 {
 //    Task SendMessage(string topicId, string messageId, string messageBody, string user, string system);
-    Task SendMessage(IMessageEntry msg);
+    Task SendMessage(IMessageQueueEntry msg);
 
 
   //  Task SendMessage(string topicId, string messageId, string messageBody, string cmd, string action, string version, string tenant, string user, string system);
@@ -123,7 +124,7 @@ public class KafkaMsgQueueServer : IPublisherServer
         //  _dbContext = dbContext;
     }
 
-    public async Task SendMessage(IMessageEntry msg)
+    public async Task SendMessage(IMessageQueueEntry msg)
     {
         // Your logic to add to database
 
@@ -142,7 +143,7 @@ public class MultiMsgQueueServer : IPublisherServer
         
     }
 
-    public async Task SendMessage(IMessageEntry msg)
+    public async Task SendMessage(IMessageQueueEntry msg)
     {
         // Your logic to add to database
         //  _dbContext = dbContext;
@@ -164,7 +165,7 @@ public class DatabasePubSubPublisherServer : IPublisherServer
       //  _dbContext = dbContext;
     }
 
-    public async Task SendMessage(IMessageEntry msg)
+    public async Task SendMessage(IMessageQueueEntry msg)
     {
         // Your logic to add to database
 
@@ -175,49 +176,4 @@ public class DatabasePubSubPublisherServer : IPublisherServer
     //{
     //    throw new NotImplementedException();
     //}
-}
-
-internal class MessageQueueEntry : IMessageEntry
-{
-
-    public int MessageId { get; set; } //Pk of the table 
-    public string TopicId { get; set; }
-    public string MsgBody { get; set; }
-    public string? User { get; set; }
-
-    public int? Retry { get; set; }
-
-    public int? MaxRetry { get; set; }
-
-    public int? MessagePriority { get; set; }
-    public int? MessageQueueProcessId { get; set; }
-    public long? ThreadId { get; set; }
-    public string? MachineName { get; set; }
-
-    public DateTime? PickupTime { get; set; }
-    public DateTime? StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
-    public int? ProcessTimeInMilliSeconds { get; set; }
-    public string? ErrorCode { get; set; }
-    public string? ErrorMessage { get; set; }
-    public DateTime? UtcExecutionTime { get; set; }
-    public DateTime? CreatedDate { get; set; }
-
-
-    public string? System { get; set; }
-    public string? CommandName { get; set; }
-    public string? ActionName { get; set; }
-    public string? TenantName { get; set; }
-    public string? CommandVersion { get; set; }
-    public DateTime PickedAt { get; set; }
-    public DateTime? ProcessedAt { get; set; }
-    public string? Status { get; set; }
-
-    [NotMapped]
-    public object? Context { get; set; }
-
-    [NotMapped]
-    public object? ExtraData { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string MessageBody { get; set; }
 }

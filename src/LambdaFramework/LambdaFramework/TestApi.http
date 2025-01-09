@@ -1,10 +1,33 @@
 # For more info on HTTP files go to https://aka.ms/vs/httpfile
 
+#    endpoints.MapPost("/api/execute/{commandName}/{actionName}/{version?}/{tenantId?}/{inputFormat?}/{outputFormat?}", async context =>
+      
+@HostAddress = http://localhost:5038
 # POST Request
-POST http://localhost:5000/api/products
+POST http://localhost:5038/api/execute/Math/Add/1.0.0.0/RomanTenant
 Content-Type: application/text
 
-1+1+1 
+I+II+III  
+
+
+# Post V2
+POST http://localhost:5038/api/execute/Math/Add/2.0.0.0/RomanTenant
+Content-Type: application/text
+
+I+II+III  
+
+
+###
+POST http://localhost:5038/api/execute/echo/echo/echo/echo
+Content-Type: application/text
+
+I+II+III  
+
+####
+POST http://localhost:5000/api/math/add/1.0.0.0/BinaryTenant
+Content-Type: application/text
+
+1+1+0
 
 
 

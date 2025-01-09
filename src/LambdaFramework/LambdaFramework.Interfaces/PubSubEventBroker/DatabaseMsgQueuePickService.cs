@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MsgQueue.Server;
 
 namespace PubSub.EventBroker;
 
@@ -27,16 +28,16 @@ public class DatabaseMsgQueuePickService : IMsgQueuePickService
     }
 
     
-    public async Task<IMsgQueueEntry?> PickMessageAsync(string topicId)
+    public async Task<IMessageQueueEntry?> PickMessageAsync(string topicId)
     {
         // Simulate picking a message from the database
         // or pick from SQS or RabbitMq
         // You can replace this with actual database logic
-        var message = await Task.FromResult(new MsgQueueEntry
+        var message = await Task.FromResult(new MessageQueueEntry
         {
             MessageId = 1,
             TopicId = topicId,
-            MsgBody = "Test Message from Database",
+            //MsgBody = "Test Message from Database",
             User = "UserA",
             System = "SystemA",
             CommandName = "Notes", //DB will get priority fallback to local config
@@ -49,23 +50,23 @@ public class DatabaseMsgQueuePickService : IMsgQueuePickService
         return message;
     }
 
-    public async Task MarkMessageAsPickedAsync(IMsgQueueEntry message)
+    public async Task MarkMessageAsPickedAsync(IMessageQueueEntry message)
     {
         // Simulate marking the message as picked in the database
-        message.PickedAt = DateTime.UtcNow;
+       // message.PickedAt = DateTime.UtcNow;
         message.Status = "Picked";
         await Task.CompletedTask;
     }
 
-    public async Task MarkAsProcessedAsync(IMsgQueueEntry message)
+    public async Task MarkAsProcessedAsync(IMessageQueueEntry message)
     {
         // Simulate marking the message as processed in the database
         message.Status = "Processed";
-        message.ProcessedAt = DateTime.UtcNow;
+      //  message.ProcessedAt = DateTime.UtcNow;
         await Task.CompletedTask;
     }
 
-    public async Task MarkAsErrorAsync(IMsgQueueEntry message, string errorMessage)
+    public async Task MarkAsErrorAsync(IMessageQueueEntry message, string errorMessage)
     {
         // Simulate marking the message as error in the database
         message.Status = "Error";

@@ -1,4 +1,6 @@
-﻿namespace MsgQueue.Client;
+﻿using MsgQueue.Server;
+
+namespace MsgQueue.Client;
 
 /// <summary>
 /// IMsgQueueClient is responsible for interacting with the message queue, picking, processing, and marking messages.
@@ -8,9 +10,9 @@ public interface IMsgQueuePickService
 {
     
     // Task StartProcessingAsync();
-    Task<IMsgQueueEntry?> PickMessageAsync(string topicId);
-    Task MarkMessageAsPickedAsync(IMsgQueueEntry message);
-    Task MarkAsProcessedAsync(IMsgQueueEntry message);
-    Task MarkAsErrorAsync(IMsgQueueEntry message, string errorMessage);
+    Task<IMessageQueueEntry?> PickMessageAsync(string topicId);
+    Task MarkMessageAsPickedAsync(IMessageQueueEntry message);
+    Task MarkAsProcessedAsync(IMessageQueueEntry message);
+    Task MarkAsErrorAsync(IMessageQueueEntry message, string errorMessage);
 }
 

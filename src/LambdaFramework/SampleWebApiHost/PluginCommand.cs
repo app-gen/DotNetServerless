@@ -84,6 +84,19 @@ public class EchoCommand : AbstractCommand, ICommand
     }
 }
 
+[Command("echo", "echo", "echo", "echo")]
+public class EchoCommand2 : AbstractCommand, ICommand
+{
+    public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec = null)
+    {
+        await Task.Delay(1);
+        Console.WriteLine(parameters);
+        return parameters.ToString();
+
+    }
+}
+
+
 [Command("Log", "Write", "1.0.0.0", "")]
 public class LogCommand : AbstractCommand, ICommand
 {

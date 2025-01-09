@@ -4,31 +4,21 @@ using MsgQueue.Server;
 namespace MsgQueue.Client;
 
 
-//Topic  Id 1/MsgTypeId -Notes Add 
-//Notes Add 
-//(V1,v2) 
-//(TenantA/TenantB)
-
-
-
-
-/// <summary>
-/// Concrete implementation of IMsgQueueClient for database interactions.
-/// Responsible for interacting with the database to pick and process messages.
-/// </summary>
-public class DatabaseMsgQueuePickService : IMsgQueuePickService
+public class SqsMsgQueuePickServiceOld : IMsgQueuePickService
 {
     private readonly IConfiguration _processor;
 
-    public DatabaseMsgQueuePickService(IConfiguration processor)
+    public SqsMsgQueuePickServiceOld(IConfiguration processor)
     {
         _processor = processor;
-    
+
     }
 
-    
+
     public async Task<IMessageQueueEntry?> PickMessageAsync(string topicId)
     {
+        //connet to sqs and call GetMessage(topicId) 
+
         // Simulate picking a message from the database
         // or pick from SQS or RabbitMq
         // You can replace this with actual database logic
@@ -42,18 +32,18 @@ public class DatabaseMsgQueuePickService : IMsgQueuePickService
             CommandName = "Notes", //DB will get priority fallback to local config
             ActionName = "Add",
             TenantName = "TenantA",
-            CommandVersion = "1.0.0.0" 
+            CommandVersion = "1.0.0.0"
         });
 
-        await MarkMessageAsPickedAsync(message);
+        //await MarkMessageAsPickedAsync(message);
         return message;
     }
 
     public async Task MarkMessageAsPickedAsync(IMessageQueueEntry message)
     {
         // Simulate marking the message as picked in the database
-        message.PickupTimeUtc = DateTime.UtcNow;
-        message.Status = "Picked";
+        //message.PickedAt = DateTime.UtcNow;
+        //message.Status = "Picked";
         await Task.CompletedTask;
     }
 
@@ -61,7 +51,7 @@ public class DatabaseMsgQueuePickService : IMsgQueuePickService
     {
         // Simulate marking the message as processed in the database
         message.Status = "Processed";
-        message.ProcessedTimeUtc = DateTime.UtcNow;
+      //  message.ProcessedAt = DateTime.UtcNow;
         await Task.CompletedTask;
     }
 
@@ -72,6 +62,4 @@ public class DatabaseMsgQueuePickService : IMsgQueuePickService
         message.ErrorMessage = errorMessage;
         await Task.CompletedTask;
     }
-
-   
 }

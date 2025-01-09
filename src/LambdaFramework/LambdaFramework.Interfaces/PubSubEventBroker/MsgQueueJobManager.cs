@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MsgQueue.Server;
 
 namespace PubSub.EventBroker;
 
@@ -72,7 +73,7 @@ public class MsgQueueJobManager : IMsgQueueJobManager
         }
     }
 
-    private void MergeMessage(IMsgQueueEntry message, TopicConfig config)
+    private void MergeMessage(IMessageQueueEntry message, TopicConfig config)
     {
         //throw new NotImplementedException();
 

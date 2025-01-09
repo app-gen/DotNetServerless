@@ -1,0 +1,83 @@
+@HostAddress = https://localhost:44374
+
+GET {{HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+{
+}
+
+###
+
+GET {{HostAddress}}/api/queue/message
+
+###
+
+POST {{HostAddress}}/api/queue/message
+
+{}
+
+###
+
+POST {{HostAddress}}/api/mq/add
+
+{
+    "topicId": "Test message",
+    "messageBody": "Test message",
+    "system": "TestSystem",
+    "user": "TestUser",
+    "messagePriority": 1,
+    "commandName": "TestCommand",
+    "actionName": "TestAction",
+    "tenantName": "TestTenant"
+}
+
+### Send a message to the queue
+POST {{HostAddress}}/api/queue/message
+Content-Type: application/json
+
+{
+    "topicId": "high-priority",
+    "messageBody": "Test message",
+    "system": "TestSystem",
+    "user": "TestUser",
+    "messagePriority": 1,
+    "commandName": "TestCommand",
+    "actionName": "TestAction",
+    "tenantName": "TestTenant"
+}
+
+### Send another message with different data
+POST {{HostAddress}}/api/queue/message
+Content-Type: application/json
+
+{
+    "topicId": "notifications",
+    "messageBody": "Important notification",
+    "system": "NotificationSystem",
+    "user": "AdminUser",
+    "messagePriority": 2,
+    "commandName": "SendNotification",
+    "actionName": "Email",
+    "tenantName": "CustomerA"
+}
+
+### Send a message with minimal data
+POST {{HostAddress}}/api/queue/message
+Content-Type: application/json
+
+{
+    "topicId": "high-priority",
+    "messageBody": "Simple message"
+}
+
+### Send a message using HTTPS
+POST {{HostAddress}}/api/queue/message
+Content-Type: application/json
+
+{
+    "topicId": "high-priority",
+    "messageBody": "Test message via HTTPS",
+    "system": "TestSystem",
+    "user": "TestUser"
+}

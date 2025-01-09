@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MsgQueue.Client.Service;
+using MsgQueue.Server;
 
 namespace MsgQueue.Client;
 
@@ -34,7 +36,7 @@ public class MsgQueueJobManager : IMsgQueueJobManager
         }
     }
 
-    private void ProcessMessagesForTopic( TopicConfig config)
+    private void ProcessMessagesForTopic(TopicConfig config)
     {
         int noOfTasks = config.MaxTasks>0? config.MaxTasks:1;
 
@@ -72,7 +74,7 @@ public class MsgQueueJobManager : IMsgQueueJobManager
         }
     }
 
-    private void MergeMessage(IMsgQueueEntry message, TopicConfig config)
+    private void MergeMessage(IMessageQueueEntry message, TopicConfig config)
     {
         //throw new NotImplementedException();
 

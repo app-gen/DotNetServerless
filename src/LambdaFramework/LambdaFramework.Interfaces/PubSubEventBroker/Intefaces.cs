@@ -1,3 +1,5 @@
+using MsgQueue.Server;
+
 namespace PubSub.EventBroker;
 
 /// <summary>
@@ -6,6 +8,6 @@ namespace PubSub.EventBroker;
 /// </summary>
 public interface IMessageQueueSystem
 {
-    Task SendMessageAsync(IMsgQueueEntry messageEntry);
+    Task SendMessageAsync(IMessageQueueEntry messageEntry);
 }
 

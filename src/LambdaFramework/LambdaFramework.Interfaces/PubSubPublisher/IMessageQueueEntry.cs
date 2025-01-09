@@ -1,4 +1,5 @@
 ﻿
+using MsgQueue.Server;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace PubSub.Publisher;
 
@@ -47,7 +48,7 @@ public interface ISubscriberEntry
 
 
 
-public interface IMessageEntry
+public interface IMessageEntry2:IMessageQueueEntry
 {
 
 
