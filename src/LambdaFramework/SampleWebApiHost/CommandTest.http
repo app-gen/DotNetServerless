@@ -1,0 +1,55 @@
+@HostAddress = https://localhost:44387
+
+
+### Common Integer Number App - /api/execute/{{command}}/{action}/<version>/<tenant>
+POST {{HostAddress}}/api/execute/Math/Add/1.0.0.0
+Content-Type: application/text
+
+1,1,1
+
+
+
+
+### Common Integer Number App - /api/execute/{{command}}/{action}/<version>/<tenant>
+POST {{HostAddress}}/api/execute/Math/Minus/1.0.0.0
+Content-Type: application/text
+
+1-2
+
+
+
+##### 1
+POST {{HostAddress}}/api/execute/Math/Add/1.0.0.0/RomanTenant
+Content-Type: application/text
+
+I+II+III  
+
+###
+
+
+##### 1
+POST {{HostAddress}}/api/execute/Math/Add/2.0.0.0/RomanTenant
+Content-Type: application/text
+
+I+II+III  
+
+###
+
+
+POST {{HostAddress}}/api/execute/Math/Add/1.0.0.0/BinaryTenant
+Content-Type: application/text
+
+1,1,1
+
+
+
+
+####
+POST {{HostAddress}}/api/execute/echo/echo/echo/echo
+Content-Type: application/text
+
+hello from client  
+
+
+
+

@@ -1,7 +1,4 @@
 ﻿
-You: 
-
-Can you write a good readme.md file based on the follwoing code "using Microsoft.Extensions.Configuration;
 
 namespace MsgQueue.Client;
 
@@ -730,15 +727,3 @@ public class MsgQueueBackgroundService : BackgroundService
 }
 ```
 
-## Contributing 
-
-Contributions are welcome! Please fork this repository and submit a pull request with your changes.
-
-## License 
-
-This project is licensed under the MIT License.
-
-
----
-
-This README provides a structured overview of how to get started with the `MsgQueue.Client` library and implement it in a .NET project. The steps include setting up the service, processing messages, and customizing the behavior to meet your application's needs.
