@@ -17,20 +17,28 @@ POST {{HostAddress}}/api/queue/message
 
 {}
 
-###
+### Insert a message in Message Queue
 
 POST {{HostAddress}}/api/mq/add
+Accept: application/json
 
 {
-    "topicId": "Test message",
-    "messageBody": "Test message",
+    "topicId": "MySqsQueueTopic",
+    "messageBody": "300123.1",
     "system": "TestSystem",
     "user": "TestUser",
     "messagePriority": 1,
     "commandName": "TestCommand",
     "actionName": "TestAction",
     "tenantName": "TestTenant"
+    "version": "1.0.0.0"
+
 }
+
+
+
+
+
 
 ### Send a message to the queue
 POST {{HostAddress}}/api/queue/message
