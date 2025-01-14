@@ -6,12 +6,18 @@ using System.Text.Json;
 using Amazon;
 using Amazon.SQS;
 using Amazon.SQS.Model;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
+
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
+using Microsoft.Extensions.Options;
+using MessageAttributeValue = Amazon.SQS.Model.MessageAttributeValue;
+
+
+
 
 namespace MsgQueue.Server;
 
-public class SqsConfig
+public class SnsConfig
 {
     public string AwsAccessKey { get; set; }
     public string AwsSecretKey { get; set; }
@@ -23,28 +29,28 @@ public class SqsConfig
 }
 
 
-public class SqsQueueProvider : IQueueProvider, IDisposable
+public class SnsQueueProvider : IQueueProvider, IDisposable
 {
-    private readonly IAmazonSQS _sqsClient;
+    private readonly IAmazonSQS _snsClient;
     private readonly ILogger<SnsQueueProvider> _logger;
     private readonly Dictionary<string, string> _queueUrlCache;
-    private readonly SqsConfig _config;
+    private readonly SnsConfig _config;
 
-    public QueueProviderType ProviderType => QueueProviderType.Sqs;
+    public QueueProviderType ProviderType => QueueProviderType.Sns;
 
 
 
-    public SqsQueueProvider(Dictionary<string, string> settings, ILogger<SnsQueueProvider> logger)
+    public SnsQueueProvider(Dictionary<string, string> settings, ILogger<SnsQueueProvider> logger)
     {
         _logger = logger;
         _queueUrlCache = new Dictionary<string, string>();
 
-        _config = new SqsConfig
+        _config = new SnsConfig
         {
             AwsAccessKey = settings["AwsAccessKey"],
             AwsSecretKey = settings["AwsSecretKey"],
             Region = settings["AwsRegion"],
-            QueueUrlPrefix = settings.GetValueOrDefault("QueueUrlPrefix", "https://sqs.{region}.amazonaws.com/{account}/"),
+            QueueUrlPrefix = settings.GetValueOrDefault("QueueUrlPrefix", "https://sns.{region}.amazonaws.com/{account}/"),
             RetryAttempts = int.Parse(settings.GetValueOrDefault("RetryAttempts", "3")),
             RetryDelayMs = int.Parse(settings.GetValueOrDefault("RetryDelayMs", "1000")),
             TopicToQueueMap = settings.ContainsKey("TopicToQueueMap")
@@ -52,16 +58,17 @@ public class SqsQueueProvider : IQueueProvider, IDisposable
                 : new Dictionary<string, string>()
         };
 
-        var sqsConfig = new AmazonSQSConfig
+        var snsConfig = new AmazonSQSConfig
         {
             RegionEndpoint = RegionEndpoint.GetBySystemName(_config.Region)
         };
 
-        _sqsClient = new AmazonSQSClient(
+        _snsClient = new AmazonSQSClient(
             _config.AwsAccessKey,
             _config.AwsSecretKey,
-            sqsConfig
+            snsConfig
         );
+
     }
 
     public async Task SendMessageAsync(IMessageQueueEntry message)
@@ -83,7 +90,7 @@ public class SqsQueueProvider : IQueueProvider, IDisposable
             if (message.ExecutionTimeUtc.HasValue)
             {
                 var delay = (int)(message.ExecutionTimeUtc.Value - DateTime.UtcNow).TotalSeconds;
-                if (delay > 0 && delay <= 900) // SQS allows max delay of 15 minutes
+                if (delay > 0 && delay <= 900) // sns allows max delay of 15 minutes
                 {
                     sendMessageRequest.DelaySeconds = delay;
                 }
@@ -93,7 +100,7 @@ public class SqsQueueProvider : IQueueProvider, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send message to SQS. TopicId: {TopicId}, MessageId: {MessageId}",
+            _logger.LogError(ex, "Failed to send message to sns. TopicId: {TopicId}, MessageId: {MessageId}",
                 message.TopicId, message.MessageId);
             throw;
         }
@@ -107,13 +114,13 @@ public class SqsQueueProvider : IQueueProvider, IDisposable
             try
             {
                 attempts++;
-                var response = await _sqsClient.SendMessageAsync(request);
-                _logger.LogInformation("Message sent to SQS. MessageId: {MessageId}", response.MessageId);
+                var response = await _snsClient.SendMessageAsync(request);
+                _logger.LogInformation("Message sent to sns. MessageId: {MessageId}", response.MessageId);
                 return;
             }
             catch (Exception ex) when (attempts < _config.RetryAttempts)
             {
-                _logger.LogWarning(ex, "Failed to send message to SQS. Attempt {Attempt} of {MaxAttempts}",
+                _logger.LogWarning(ex, "Failed to send message to sns. Attempt {Attempt} of {MaxAttempts}",
                     attempts, _config.RetryAttempts);
                 await Task.Delay(_config.RetryDelayMs * attempts);
             }
@@ -134,19 +141,19 @@ public class SqsQueueProvider : IQueueProvider, IDisposable
         }
         else
         {
-            queueName = topicId.Replace(".", "-").ToLower(); // SQS naming conventions
+            queueName = topicId.Replace(".", "-").ToLower(); // sns naming conventions
         }
 
         try
         {
-            var response = await _sqsClient.GetQueueUrlAsync(queueName);
+            var response = await _snsClient.GetQueueUrlAsync(queueName);
             var queueUrl = response.QueueUrl;
             _queueUrlCache[topicId] = queueUrl;
             return queueUrl;
         }
         catch (QueueDoesNotExistException)
         {
-            _logger.LogError("SQS Queue not found for topic {TopicId}", topicId);
+            _logger.LogError("sns Queue not found for topic {TopicId}", topicId);
             throw new InvalidOperationException($"Queue not found for topic {topicId}");
         }
     }
@@ -242,7 +249,7 @@ public class SqsQueueProvider : IQueueProvider, IDisposable
         try
         {
             // List queues as a simple health check
-            var response = await _sqsClient.ListQueuesAsync(new ListQueuesRequest
+            var response = await _snsClient.ListQueuesAsync(new ListQueuesRequest
             {
                 MaxResults = 1
             });
@@ -250,22 +257,13 @@ public class SqsQueueProvider : IQueueProvider, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "SQS health check failed");
+            _logger.LogError(ex, "sns health check failed");
             return false;
         }
     }
 
     public void Dispose()
     {
-        _sqsClient?.Dispose();
+        _snsClient?.Dispose();
     }
 }
-/*
-
-namespace LambdaFramework.Interfaces.MsgQueueServer
-{
-    class SampleMQServer
-    {
-    }
-}
-*/

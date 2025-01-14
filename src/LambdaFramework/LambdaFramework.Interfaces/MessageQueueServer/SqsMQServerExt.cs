@@ -23,6 +23,7 @@ public enum QueueProviderType
 {
     Database,
     Sqs,
+    Sns,
    // RabbitMq,
   //  ZeroMq
 }
@@ -168,7 +169,7 @@ public static class MessageQueueServiceExtensions1
         // Register SQS provider as scoped
         services.AddScoped<IQueueProvider>(sp =>
         {
-            var logger = sp.GetRequiredService<ILogger<SqsQueueProvider>>();
+            var logger = sp.GetRequiredService<ILogger<SnsQueueProvider>>();
             return new SqsQueueProvider(config.Settings, logger);
         });
 

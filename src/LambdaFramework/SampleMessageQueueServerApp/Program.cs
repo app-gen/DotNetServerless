@@ -1,6 +1,6 @@
 using MsgQueue.Server;
 
-namespace SampleMessageQueueServerApp;
+namespace Sample.MsgQueue.Server.App;
 
 public class Program
 {
@@ -42,11 +42,6 @@ public class Program
         ///////////////////////////////////////
 
 
-
-
-
-
-
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -66,7 +61,7 @@ public class Program
         ///
 
         // Add message queue middleware
-        app.UseMessageQueueServer();
+        //app.UseMessageQueueServer();
 
 
         // optional for test Add a sample endpoint to test the queue
@@ -84,24 +79,6 @@ public class Program
             await messageQueue.SendMessage(message);
             return Results.Ok("Message queued successfully");
         });
-
-        // optional for test Add a sample endpoint to test the queue
-        app.MapGet("/api/queue/message", async (IMessageQueueServer messageQueue) =>
-        {
-            var message = new MessageQueueEntry
-            {
-                TopicId = "high-priority",
-                MessageBody = "Test message",
-                System = "TestSystem",
-                User = "TestUser",
-                CreatedTimeUtc = DateTime.UtcNow
-            };
-
-           // await messageQueue.SendMessage(message);
-            return Results.Ok("Message queued successfully");
-        });
-
-
 
 
 

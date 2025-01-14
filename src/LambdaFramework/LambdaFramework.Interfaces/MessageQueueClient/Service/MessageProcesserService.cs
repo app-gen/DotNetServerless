@@ -138,7 +138,8 @@ public partial class MessageProcessingService : BackgroundService
             }
         }
     }
-
+    //Important Entry Point
+    //Main Function
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Message Processing Service is starting...");
