@@ -22,12 +22,12 @@ public class StartupConfig
         services.AddHostedService<MsgQueueBackgroundService>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void Configure(IApplicationBuilder app)
     {
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
+        //if (env.IsDevelopment())
+        //{
+        //    app.UseDeveloperExceptionPage();
+        //}
 
         // Other middleware registrations...
 

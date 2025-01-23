@@ -1,5 +1,5 @@
 ﻿
-namespace MsgQueue.Client.Serive;
+namespace MsgQueue.Client.Service;
 
 public class TopicProcessingState
 {

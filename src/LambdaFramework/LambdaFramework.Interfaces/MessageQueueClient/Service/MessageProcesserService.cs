@@ -5,12 +5,14 @@ using MsgQueue.Client;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using MsgQueue.Server;
+using LambdaFramework.Common;
 
-namespace MsgQueue.Client.Serive;
+namespace MsgQueue.Client.Service;
 
 public partial class MessageProcessingService : BackgroundService
 {
     private readonly ILogger<MessageProcessingService> _logger;
+    private readonly ICommandRouter _commandRouter;
     private readonly IMsgQueuePickService _queueService;
     private readonly MessageProcessingConfig _config;
     private readonly TelemetryService _telemetry;
@@ -19,10 +21,12 @@ public partial class MessageProcessingService : BackgroundService
     private readonly CancellationTokenSource _shutdownTokenSource;
     public MessageProcessingService(
         ILogger<MessageProcessingService> logger,
+         ICommandRouter commandRouter,
         IMsgQueuePickService queueService,
         IConfiguration configuration,
         TelemetryService telemetry)
     {
+        _commandRouter = commandRouter;
         _logger = logger;
         _queueService = queueService;
         _telemetry = telemetry;
@@ -106,7 +110,7 @@ public partial class MessageProcessingService : BackgroundService
 
                 try
                 {
-                    await _queueService.MarkMessageAsPickedAsync(message);
+                  //  await _queueService.MarkMessageAsPickedAsync(message);
 
                     _logger.LogInformation("Processing message {MessageId} from topic {TopicId}",
                         message.MessageId, topicId);
@@ -198,7 +202,7 @@ public partial class MessageProcessingService : BackgroundService
                     taskId, message.MessageId, topicId);
 
                 // Mark the message as picked
-                await _queueService.MarkMessageAsPickedAsync(message);
+              //  await _queueService.MarkMessageAsPickedAsync(message);
 
                 try
                 {

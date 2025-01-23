@@ -11,7 +11,7 @@ public interface IMsgQueuePickService
     
     // Task StartProcessingAsync();
     Task<IMessageQueueEntry?> PickMessageAsync(string topicId);
-    Task MarkMessageAsPickedAsync(IMessageQueueEntry message);
+  //  Task MarkMessageAsPickedAsync(IMessageQueueEntry message);
     Task MarkAsProcessedAsync(IMessageQueueEntry message);
     Task MarkAsErrorAsync(IMessageQueueEntry message, string errorMessage);
 }

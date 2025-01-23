@@ -1,7 +1,7 @@
 ﻿namespace LambdaFramework.Common;
 
 [Command("Math", "Add", "1.0.0.0", "")]
-public class AddCommand : AbstractCommand, ICommand
+public class MathAddCommand : AbstractCommand, ICommand
 {
     public async override Task<string> Execute(string parameters, ICommandContext? context = null, IExecutionContext ec =null)
     {

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 //using OpenTelemetry;
 
-namespace MsgQueue.Client.Serive;
+namespace MsgQueue.Client.Service;
 
 public class TelemetryService
 {
