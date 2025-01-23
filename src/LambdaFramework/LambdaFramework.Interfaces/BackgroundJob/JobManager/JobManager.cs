@@ -8,6 +8,7 @@ using LambdaFramework.Common;
 using MsgQueue.Client;
 using Microsoft.Extensions.Configuration;
 using MsgQueue.Client.Service;
+using MsgQueue.Server;
 
 namespace Command.Job;
 
@@ -18,7 +19,7 @@ namespace Command.Job;
         private readonly IServiceProvider _globalServiceProvider;
         private readonly IJobConfigurationProvider _configProvider;
         private readonly ICommandRouter _commandRouter;
-         private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
     //  private readonly IMsgQueuePickService _queueService;
 
@@ -27,7 +28,7 @@ namespace Command.Job;
         private readonly ConcurrentDictionary<string, Assembly> _loadedAssemblies;
         private readonly Timer _configRefreshTimer;
         private readonly Timer _maintenanceWindowCheckTimer;
-        private readonly IMsgQueuePickService _queueService;
+        private readonly IMsgQueuePickService? _queueService;
 
         public JobConfig _jobConfig { get; set; }
 
@@ -35,26 +36,21 @@ namespace Command.Job;
             ILogger<JobManager> logger,
             IServiceProvider globalServiceProvider,
             IJobConfigurationProvider configProvider,
-            IMsgQueuePickService queueService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IMsgQueuePickService? queueService=null
+            )
         {
             _logger = logger;
             _configuration = configuration;
             _globalServiceProvider = globalServiceProvider;
             _configProvider = configProvider;
-            _queueService = queueService;
+            if (queueService!=null)
+                _queueService = queueService;
             _localServiceCollections = new ConcurrentDictionary<string, IServiceCollection>();
             _jobCancellationTokens = new ConcurrentDictionary<string, CancellationTokenSource>();
             _loadedAssemblies = new ConcurrentDictionary<string, Assembly>();
 
-        //for the time being use config file;
-
-            //_jobConfig = new JobConfig();
-            //_configuration.GetSection("Jobs").Bind(_jobConfig);
-
-        //    var m = new MockJObs();
-          //  _jobConfig.Topics = m.GetMockJobs();
-
+        
 
             // Refresh configuration every 15 minutes
            // _configRefreshTimer = new Timer(_ => RefreshConfiguration(), null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
@@ -66,25 +62,38 @@ namespace Command.Job;
 
      
 
-        private async Task RefreshConfiguration(CancellationToken? stoppingToken=null)
+        private async Task RefreshJobs(CancellationToken? stoppingToken=null)
         {
             try
             {
                 var configs =  _configProvider.GetJobConfigurationsAsync();
                 foreach (var config in configs)
                 {
-                    if (!_jobCancellationTokens.ContainsKey(config.Id) && config.IsEnabled)
+                    try
                     {
-                        if (config.Type == JobType.BackgroundJob)
+                        if (!_jobCancellationTokens.ContainsKey(config.Id) && config.IsEnabled)
                         {
-                            Console.WriteLine("Background");
-                            StartBackgroundJob(config);
+                            if (config.Type == JobType.BackgroundJob)
+                            {
+                                Console.WriteLine("Background");
+                                StartBackgroundJob(config);
+                            }
+                            else if (config.Type == JobType.MsgQueueClient)
+                            {
+                                Console.WriteLine("Background");
+                                StartMQBackgroundJob(config);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Schedule");
+                                StartScheduledTask(config);
+                            }
+
                         }
-                        else
-                        {
-                            Console.WriteLine("Schedule");
-                            StartScheduledTask(config);
-                        }
+                    }
+                    catch (Exception ex) { 
+                
+                
                     }
                 }
             }
@@ -154,7 +163,64 @@ namespace Command.Job;
            // await Task.Delay(100);
         }
 
-        private void  StartBackgroundJob(JobTopicConfiguration config)
+
+    private void StartMQBackgroundJob(JobTopicConfiguration config)
+    {
+        var tokenSource = new CancellationTokenSource();
+        _jobCancellationTokens.TryAdd(config.Id, tokenSource);
+
+        Type? jobType;
+        IMessageProcessor? job = null;
+        
+        
+        try
+        {
+            jobType = LoadType(config);
+            Console.WriteLine("creating tasks " + jobType);
+            job = (IMessageProcessor)ActivatorUtilities.CreateInstance(CreateServiceProvider(config.AssemblyName), jobType);
+            Console.WriteLine("creating tasks" + jobType + job);
+        }
+        catch
+        {
+
+            return;
+        }
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                
+               
+
+                
+                //todo call init of job
+                int max = config.MaxThreads;
+                if (max <= 0)
+                {
+                    max = 1;
+                }
+                var threads = new Task[max];
+                for (int i = 0; i < config.MaxThreads; i++)
+                {
+                    int thread = i; //take local to avoid thead local issue
+                    Console.WriteLine("creating tasks");
+                    threads[i] = ExecuteMqJob(thread, job, config, tokenSource.Token);
+                }
+
+                await Task.WhenAll(threads);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("creating tasks", ex);
+
+                _logger.LogError(ex, "Error running background job {JobId}", config.Id);
+            }
+        }, tokenSource.Token);
+    }
+
+
+    private void  StartBackgroundJob(JobTopicConfiguration config)
         {
             var tokenSource = new CancellationTokenSource();
             _jobCancellationTokens.TryAdd(config.Id, tokenSource);
@@ -180,7 +246,7 @@ namespace Command.Job;
                     {
                         int thread = i; //take local to avoid thead local issue
                         Console.WriteLine("creating tasks");
-                        threads[i] = RunJob(thread, job, config, tokenSource.Token);
+                        threads[i] = ExecuteBackgroundJob(thread, job, config, tokenSource.Token);
                     }
 
                     await Task.WhenAll(threads);
@@ -205,37 +271,55 @@ namespace Command.Job;
                 pollTimeInMilliSecond = config.PollTimeInMilliSecond;
             }
 
-            Task.Run(async () =>
+            var taskType = LoadType(config);
+            if (taskType == null)
+            {
+                throw new Exception("IScheduledTask Type not found");
+            }
+
+            IScheduledTask task = ActivatorUtilities.CreateInstance(CreateServiceProvider(config.AssemblyName), taskType) as IScheduledTask;
+
+            if (task == null)
+            {
+                throw new Exception("IScheduledTask not found");
+            }
+
+
+        Task.Run(async () =>
             {
                 try
                 {
-                    var taskType = LoadType(config);
-                    if (taskType == null)
-                    {
-                        throw new Exception("IScheduledTask Type not found");
-                    }
-
-                    IScheduledTask task = ActivatorUtilities.CreateInstance(CreateServiceProvider(config.AssemblyName), taskType) as IScheduledTask;
-
-                    if (task == null)
-                    {
-                        throw new Exception("IScheduledTask not found");
-                    }
+                    
                     
                     var schedule = CrontabSchedule.Parse(config.CronExpression);
                     var nextRun = schedule.GetNextOccurrence(DateTime.UtcNow);
+                    Console.WriteLine(nextRun);
 
                     await task.Initilize(null, null);
 
                     while (!tokenSource.Token.IsCancellationRequested)
                     {
-                        var now = DateTime.UtcNow;
-                        if (now >= nextRun && !config.IsInPauseWindow(now))
+
+                        try
                         {
-                           // await task.ExecuteAsync(CreateServiceProvider(config.AssemblyName), tokenSource.Token);
-                            nextRun = schedule.GetNextOccurrence(DateTime.UtcNow);
+                            var now = DateTime.UtcNow;
+                            if (now >= nextRun && !config.IsInPauseWindow(now))
+                            {
+                                await task.ExecuteAsync(tokenSource.Token,0,null);
+
+                                nextRun = schedule.GetNextOccurrence(DateTime.UtcNow);
+                            }
+                            Console.WriteLine("waiting for nextRun");
+
+                            Console.WriteLine(nextRun);
+
+                            await Task.Delay(pollTimeInMilliSecond, tokenSource.Token); //wait for a min
                         }
-                        await Task.Delay(pollTimeInMilliSecond, tokenSource.Token); //wait for a min
+                        catch (Exception ex) {
+
+                            await Task.Delay(pollTimeInMilliSecond, tokenSource.Token);
+
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -245,16 +329,17 @@ namespace Command.Job;
             }, tokenSource.Token);
         }
 
-        private async Task RunJob(int instance, IBackgroundJob job, JobTopicConfiguration config, CancellationToken cancellationToken)
+        private async Task ExecuteBackgroundJob(int instance, IBackgroundJob job, JobTopicConfiguration config, CancellationToken cancellationToken)
         {
             Console.WriteLine("IBackgroundJob " +  job);
 
-                Console.WriteLine( job);
-
-                await Task.Delay(1000);
+            int counter = 0;
 
             while (!cancellationToken.IsCancellationRequested)
             {
+
+
+                if (counter > 10000) counter = 10000;
 
                 try
                 {
@@ -263,14 +348,21 @@ namespace Command.Job;
                     Console.WriteLine("Running " +  instance + "   " +   now);
                     await job.ExecuteAsync(cancellationToken);
 
-                    await Task.Delay(1000);
+                    await Task.Delay(10);
+
+                    if (config.DelayInMilliSecondForEveryRun>0)
+                    {
+                        await Task.Delay(config.DelayInMilliSecondForEveryRun);
+                    }
+                    counter = 0;
 
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Failed to run job: {e}");
+                    counter = counter *2 ;
+                    Console.WriteLine($"Failed to run job: {e} : Counter {counter}");
 
-                    await Task.Delay(1000);
+                    await Task.Delay(counter * 1000);
 
                 }
             }
@@ -301,7 +393,123 @@ namespace Command.Job;
             */
         }
 
-        private Type LoadType(JobTopicConfiguration config)
+
+
+
+    private async Task ExecuteMqJob(int instance, IMessageProcessor job, 
+        JobTopicConfiguration config, CancellationToken cancellationToken)
+    {
+        Console.WriteLine("IMessageTask " + job);
+        int counter = 0;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (counter > 10000) counter = 10000;
+
+            try
+            {
+                var now = DateTime.UtcNow;
+                await PickAndProcessMessage(instance, job, config, cancellationToken);
+
+                await Task.Delay(1000);
+                counter = 0;
+
+
+            }
+            catch (Exception e)
+            {
+                counter = counter * 2;
+                Console.WriteLine($"Failed to run job: {e} : Counter {counter}");
+
+                await Task.Delay(counter * 1000);
+
+            }
+        }
+
+
+        //return Task.CompletedTask;
+
+        /*
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                string message =  _queueService.DequeueMessageAsync(config.QueueName, cancellationToken);
+                if (message != null)
+                {
+                    try
+                    {
+                       /// await job.ProcessMessageAsync(message, CreateServiceProvider(config.AssemblyName), cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error processing message for job {JobId}", config.Id);
+                    }
+                }
+                else
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(config.EmptyQueueWaitTimeSeconds), cancellationToken);
+                }
+            }
+        */
+    }
+
+
+    private  async Task PickAndProcessMessage(int instance, IMessageProcessor job,
+        JobTopicConfiguration config, CancellationToken cancellationToken)
+    {
+        if (this._queueService == null)
+        {
+            Console.WriteLine("this._queueService == null");
+        }
+
+        IMessageQueueEntry?  message = await  _queueService.PickMessageAsync(config.QueueName);
+        if (message == null)
+        {
+            await Task.Delay(10000);
+        }
+
+        try
+        {
+            await job.ExecuteAsync(message,cancellationToken,config,instance,null);
+            //mark as complete;
+
+        }
+        catch {
+
+            //mark as complete;
+            await Task.Delay(10000);
+
+        }
+
+
+        /*
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                string message =  _queueService.DequeueMessageAsync(config.QueueName, cancellationToken);
+                if (message != null)
+                {
+                    try
+                    {
+                       /// await job.ProcessMessageAsync(message, CreateServiceProvider(config.AssemblyName), cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error processing message for job {JobId}", config.Id);
+                    }
+                }
+                else
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(config.EmptyQueueWaitTimeSeconds), cancellationToken);
+                }
+            }
+        */
+    }
+
+
+
+
+
+
+    private Type LoadType(JobTopicConfiguration config)
         {
             var assembly = _loadedAssemblies.GetOrAdd(config.AssemblyName, LoadAssembly);
             return assembly.GetType(config.TypeName) ?? throw new TypeLoadException($"Could not load type {config.TypeName}");
@@ -340,7 +548,7 @@ namespace Command.Job;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await  RefreshConfiguration(stoppingToken);
+        await  RefreshJobs(stoppingToken);
         
        // return base.ExecuteAsync(stoppingToken);
 

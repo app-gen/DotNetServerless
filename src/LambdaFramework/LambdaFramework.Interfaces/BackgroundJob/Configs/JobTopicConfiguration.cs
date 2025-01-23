@@ -17,6 +17,9 @@ public partial class JobTopicConfiguration: ITopicConfig
     public int MaxThreads { get; set; } = 1;
     public int EmptyQueueWaitTimeSeconds { get; set; } = 60;
 
+    public int DelayInMilliSecondForEveryRun { get; set; } = 10000; //can be 0
+
+
     // Scheduled Task specific
     public string CronExpression { get; set; }
 

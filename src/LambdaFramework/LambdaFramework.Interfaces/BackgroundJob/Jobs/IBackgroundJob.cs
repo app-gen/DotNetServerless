@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using LambdaFramework.Common;
 using Quartz;
+using MsgQueue.Server;
 namespace Command.Job;
 
 public interface IBackgroundJob:  IJob
@@ -11,5 +12,7 @@ public interface IBackgroundJob:  IJob
     Task Initilize(IServiceCollection collection, ICommandRouter router); 
 
     Task ExecuteAsync(CancellationToken cancellationToken, int agentId=0, IServiceProvider? sp=null);
+
+
 
 }

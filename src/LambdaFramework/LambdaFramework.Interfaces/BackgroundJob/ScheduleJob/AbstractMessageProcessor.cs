@@ -1,20 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using LambdaFramework.Common;
 using Quartz;
+using MsgQueue.Server;
 
 namespace Command.Job;
 
-public interface IScheduledTask: IBackgroundJob, IJob    {    }
-
-
-[Command("Abstract", "ScheduleTask", "1.0.0.0", "")]
-public abstract class AbstractScheduleTask : AbstractCommand, IScheduledTask, ICommand, IJob
+[Command("Abstract", "MQ", "1.0.0.0", "")]
+public abstract class AbstractMessageProcessor : AbstractCommand, IMessageProcessor, ICommand, IJob
 {
 
     public string JobId { get; set; }
 
     public string TaskId { get; set; }
-    public ICommandRouter CommmandRouter { get;  set; }
+    public ICommandRouter CommmandRouter { get; set; }
     public string AgentId { get; set; }
 
     public Task Execute(IJobExecutionContext context)
@@ -22,7 +20,7 @@ public abstract class AbstractScheduleTask : AbstractCommand, IScheduledTask, IC
         throw new NotImplementedException();
     }
 
-    public virtual Task ExecuteAsync(CancellationToken cancellationToken, int agentId=0, IServiceProvider? sp=null)
+    public virtual Task ExecuteAsync(CancellationToken cancellationToken, int agentId = 0, IServiceProvider? sp = null)
     {
         //throw new NotImplementedException();
 
@@ -32,6 +30,11 @@ public abstract class AbstractScheduleTask : AbstractCommand, IScheduledTask, IC
 
     }
 
+    public virtual Task ExecuteAsync(IMessageQueueEntry messageEntry, CancellationToken cancellationToken, JobTopicConfiguration? config,  int agentId = 0, IServiceProvider? sp = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public virtual Task Initilize(IServiceCollection collection, ICommandRouter router)
     {
         this.CommmandRouter = router;
@@ -39,7 +42,7 @@ public abstract class AbstractScheduleTask : AbstractCommand, IScheduledTask, IC
         Console.WriteLine("AbstractBackgroundJob.Init");
         return Task.CompletedTask;
     }
-    
-    
+
+
 
 }
